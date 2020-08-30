@@ -15,7 +15,7 @@ class AuthorController extends Controller
     public function index()
     {
         $author = Author::get();
-        //$book Book::all();
+        //$author = Author::all();
         if($author && $author->count() > 0){
             return response(["message" => "Show data success", "data" => $author] ,200);
         }else{
