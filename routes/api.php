@@ -21,10 +21,22 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::resource("books", "BookController");
 Route::resource("authors", "AuthorController");
 
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'auth'
+
+], function ($router) {
+    
+    Route::post('login', 'AuthController@login');
+    Route::post('register', 'AuthController@register');
+    Route::post('logout', 'AuthController@logout');
+    Route::post('refresh', 'AuthController@refresh');
+    Route::get('user-profile', 'AuthController@userProfile');
+});
+
 /**Route::get('books', 'BookController@index'); // show/read all data
  * Route::post('books', 'BookController@store'); // create new data
  * Route::get('books/{id}', 'BookController@show');//show/read data by id
  * Route::put('books/{id}', 'BookController@update');// update data by id
  * Route::delete('books/{id}', 'BookController@destroy');// delete data by id
 */
-

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Book;
+use Validator;
 
 class BookController extends Controller
 {
@@ -14,26 +15,19 @@ class BookController extends Controller
      */
     public function index()
     {
-        //native: select * from books;
-        $book = Book::get();
-        //$book Book::all();
-        if($book && $book->count() > 0){
-            return response(["message" => "Show data success", "data" => $book] ,200);
-        }else{
-            return response(["message" => "Data not found", "data" => null], 404);
-        }
+        //
+        return Book::get();
     }
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
-     *
-     * public function create()
-     * {
-     *     //
-     * }
      */
+    public function create()
+    {
+        //
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -43,14 +37,21 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        $book = Book::create([
-            "title" => $request->input('title'),
-            "description" => $request->input('description'),
-            "author" => $request->input('author'),
-            "publisher" => $request->input('publisher'),
-            "date_of_issue" => $request->input('date_of_issue')
-        ]);
-        return response(["message" => "Create data success", "data" => $book] ,200);
+        //
+        $isLoggedIn = auth()->user();
+        if ($isLoggedIn) {
+            $data = Book::create([
+                "title" => $request->input('title'),
+                "description" => $request->input('description'),
+                "author" => $request->input('author'),
+                "publisher" => $request->input('publisher'),
+                "date_of_issue" => $request->input('date_of_issue')
+            ]);
+            
+            return response(['message' => 'Create data success', 'data' => $data], 201);
+        } else {
+            return response(['message' => 'Not authenticated', 'data' => null], 401);
+        }
     }
 
     /**
@@ -61,12 +62,8 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $book = Book::find($id);
-        if($book && $book->count() > 0){
-            return response(["message" => "Show data success", "data" => $book] ,200);
-        }else{
-            return response(["message" => "Data not found", "data" => null], 404);
-        }
+        //
+        return Book::find($id);
     }
 
     /**
@@ -89,28 +86,19 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        /*return Book::find($id)->update([
-            "title" => $request->input('title'),
-            "description" => $request->input('description'),
-            "author" => $request->input('author'),
-            "publisher" => $request->input('publisher'),
-            "date_of_issue" => $request->input('date_of_issue')
+        $isLoggedIn = auth()->user();
+        if ($isLoggedIn) {
+            $data = Book::find($id)->update([
+                "title" => $request->input('title'),
+                "description" => $request->input('description'),
+                "author" => $request->input('author'),
+                "publisher" => $request->input('publisher'),
+                "date_of_issue" => $request->input('date_of_issue')
+            ]);
+            return response(['message' => 'Update data success', 'data' => $data], 201);
 
-        ]);*/
-        $book = Book::find($id);
-        if($book){
-            $book->title = $request->title;
-            $book->description = $request->description;
-            $book->author = $request->author;
-            $book->publisher = $request->publisher;
-            $book->date_of_issue = $request->date_of_issue;
-
-            $book->save();
-
-            return response(["message" => "Update data success", "data" => $book] ,204); //no content
-            //return response(["message" => "Update data success", "data" => $book] ,201);
-        }else{
-            return response(["message" => "Update data failed", "data" => null], 406);
+        } else {
+            return response(['message' => 'Not authenticated', 'data' => null], 401);
         }
     }
 
@@ -122,15 +110,14 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        $book = Book::find($id);
-        if($book){
-            $book->delete();
-
-            return response([], 204);
-        }else{
-            return response(["message" => "Remove data failed", "data" => null], 406);
+        $isLoggedIn = auth()->user();
+        if ($isLoggedIn) {
+            $data = Book::destroy($id);
+            return response(['message' => 'Delete data success', 'data' => $data], 201);
+            
+        } else {
+            return response(['message' => 'Not authenticated', 'data' => null], 401);
         }
-
-        return Book::destroy($id);
+    
     }
 }
